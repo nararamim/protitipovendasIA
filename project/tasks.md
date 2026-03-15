@@ -9,11 +9,11 @@
 
 # Tasks - spec-3-v1
 
-- [ ] Adicionar estado civil no domínio de Cliente
-- [ ] Criar enum de estado civil com valores permitidos
-- [ ] Atualizar contratos de API (request/response) para incluir estado civil
-- [ ] Aplicar validação de estado civil em criação e atualização
-- [ ] Persistir estado civil na camada de repositório/banco
-- [ ] Permitir filtro opcional por estado civil na listagem de clientes
-- [ ] Criar/atualizar testes unitários de domínio, service e controller
-- [ ] Criar/atualizar testes de repositório para persistência do campo
+- [x] Adicionar estado civil no domínio de Cliente
+- [x] Criar enum de estado civil com valores permitidos
+- [x] Atualizar contratos de API (request/response) para incluir estado civil
+- [x] Aplicar validação de estado civil em criação e atualização
+- [x] Persistir estado civil na camada de repositório/banco
+- [x] Permitir filtro opcional por estado civil na listagem de clientes
+- [x] Criar/atualizar testes unitários de domínio, service e controller
+- [x] Criar/atualizar testes de repositório para persistência do campo

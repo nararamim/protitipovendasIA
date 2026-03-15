@@ -1,59 +1,87 @@
 package com.protitipo.vendas.domain;
 
+import com.protitipo.vendas.exception.ValidationException;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.UUID;
 
-public class Customer {
-    private final String id;
+public final class Customer {
+    private final UUID id;
     private final String name;
     private final LocalDate birthDate;
-    private final Document document;
+    private final String document;
     private final Address address;
+    private final MaritalStatus maritalStatus;
 
-    public Customer(final String id,
-             final String name,
-             final LocalDate birthDate,
-             final Document document,
-             final Address address) {
-        this.id = requireNotBlank(id, "Identificador de cliente é obrigatório");
+    private Customer(
+        final UUID id,
+        final String name,
+        final LocalDate birthDate,
+        final String document,
+        final Address address,
+        final MaritalStatus maritalStatus
+    ) {
+        this.id = id;
         this.name = validateName(name);
-        this.birthDate = Objects.requireNonNull(birthDate, "Data de nascimento é obrigatória");
-        this.document = Objects.requireNonNull(document, "Documento é obrigatório");
-        this.address = Objects.requireNonNull(address, "Endereço é obrigatório");
+        this.birthDate = requireNonNull(birthDate, "birthDate");
+        this.document = validateDocument(document);
+        this.address = requireNonNull(address, "address");
+        this.maritalStatus = requireNonNull(maritalStatus, "estadoCivil");
     }
 
-    private static String requireNotBlank(final String value, final String message) {
+    public static Customer create(
+        final String name,
+        final LocalDate birthDate,
+        final String document,
+        final Address address,
+        final MaritalStatus maritalStatus
+    ) {
+        return new Customer(UUID.randomUUID(), name, birthDate, document, address, maritalStatus);
+    }
+
+    public Customer update(
+        final String name,
+        final LocalDate birthDate,
+        final String document,
+        final Address address,
+        final MaritalStatus maritalStatus
+    ) {
+        return new Customer(id, name, birthDate, document, address, maritalStatus);
+    }
+
+    private static String validateName(final String value) {
+        final String text = requireText(value, "name");
+        if (text.length() > 60) {
+            throw new ValidationException("Field 'name' must have at most 60 characters");
+        }
+        return text;
+    }
+
+    private static String validateDocument(final String value) {
+        final String text = requireText(value, "document").replaceAll("\\D", "");
+        if (!DocumentValidator.isValidCpfOrCnpj(text)) {
+            throw new ValidationException("Field 'document' must be a valid CPF or CNPJ");
+        }
+        return text;
+    }
+
+    private static String requireText(final String value, final String field) {
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(message);
+            throw new ValidationException("Field '%s' is required".formatted(field));
         }
         return value.trim();
     }
 
-    private static String validateName(final String name) {
-        final String trimmed = requireNotBlank(name, "Nome é obrigatório");
-        if (trimmed.length() > 60) {
-            throw new IllegalArgumentException("Nome deve ter no máximo 60 caracteres");
+    private static <T> T requireNonNull(final T value, final String field) {
+        if (value == null) {
+            throw new ValidationException("Field '%s' is required".formatted(field));
         }
-        return trimmed;
+        return value;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public Document getDocument() {
-        return document;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public LocalDate getBirthDate() { return birthDate; }
+    public String getDocument() { return document; }
+    public Address getAddress() { return address; }
+    public MaritalStatus getMaritalStatus() { return maritalStatus; }
 }
